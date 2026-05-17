@@ -11,8 +11,14 @@ export default function HomePage() {
   const [steamData, setSteamData] =
     useState<any[]>([])
 
+  const [logs, setLogs] =
+    useState<string[]>([])
+
   const [currentTime, setCurrentTime] =
     useState("")
+
+  const [socketStatus, setSocketStatus] =
+    useState("CONNECTED")
 
   useEffect(() => {
 
@@ -24,7 +30,40 @@ export default function HomePage() {
       setLoggedIn(true)
 
       const socket = io(
-        "http://127.0.0.1:5000"
+        "http://127.0.0.1:5001"
+      )
+
+      socket.on(
+        "connect",
+        () => {
+
+          setSocketStatus(
+            "CONNECTED"
+          )
+
+        }
+      )
+
+      socket.on(
+        "disconnect",
+        () => {
+
+          setSocketStatus(
+            "DISCONNECTED"
+          )
+
+        }
+      )
+
+      socket.io.on(
+        "reconnect_attempt",
+        () => {
+
+          setSocketStatus(
+            "RECONNECTING"
+          )
+
+        }
       )
 
       socket.on(
@@ -33,17 +72,53 @@ export default function HomePage() {
 
           setSteamData(data)
 
+          const bigMove = data.some(
+
+            (item: any) =>
+
+              Math.abs(
+                parseFloat(item.move)
+              ) >= 0.10
+
+          )
+
+          if (bigMove) {
+
+            const audio =
+              new Audio("/alert.mp3")
+
+            audio.volume = 0.4
+
+            audio.play()
+
+          }
+
+        }
+      )
+
+      socket.on(
+        "activity_logs",
+        (data) => {
+
+          setLogs(data)
+
         }
       )
 
       const clock =
         setInterval(() => {
 
-          updateClock()
+          const now = new Date()
+
+          setCurrentTime(
+
+            now.toLocaleTimeString(
+              "vi-VN"
+            )
+
+          )
 
         }, 1000)
-
-      updateClock()
 
       return () => {
 
@@ -61,20 +136,6 @@ export default function HomePage() {
     }
 
   }, [])
-
-  const updateClock = () => {
-
-    const now = new Date()
-
-    setCurrentTime(
-
-      now.toLocaleTimeString(
-        "vi-VN"
-      )
-
-    )
-
-  }
 
   const logout = () => {
 
@@ -101,7 +162,7 @@ export default function HomePage() {
 
       <div className="h-[55px] bg-[#17233a] flex items-center justify-between px-3 border-b border-[#24324a]">
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
 
           <div className="text-lg font-black">
 
@@ -121,23 +182,13 @@ export default function HomePage() {
 
           <div className="text-cyan-400 border-b-2 border-cyan-400 pb-1 text-xs font-bold">
 
-            Live Scanner
+            LIVE SCANNER
 
           </div>
 
         </div>
 
         <div className="flex items-center gap-2">
-
-          <a
-            href="https://t.me/sokeoscanner"
-            target="_blank"
-            className="bg-[#243b63] hover:bg-[#2c4c7d] text-white px-2 py-1 rounded-lg text-xs border border-cyan-500"
-          >
-
-            💬 Telegram
-
-          </a>
 
           <button
             onClick={logout}
@@ -148,9 +199,60 @@ export default function HomePage() {
 
           </button>
 
-          <div className="flex items-center gap-1 text-white font-bold text-xs">
+          <div
 
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            className={`
+
+              px-2 py-1 rounded-lg text-[10px] font-bold
+
+              ${socketStatus === "CONNECTED"
+
+                ?
+
+                "bg-green-500 text-white"
+
+                :
+
+                socketStatus === "RECONNECTING"
+
+                ?
+
+                "bg-yellow-500 text-black"
+
+                :
+
+                "bg-red-500 text-white"
+
+              }
+
+            `}
+          >
+
+            {
+
+              socketStatus === "CONNECTED"
+
+                ?
+
+                "LIVE"
+
+                :
+
+                socketStatus === "RECONNECTING"
+
+                ?
+
+                "RECONNECT"
+
+                :
+
+                "OFFLINE"
+
+            }
+
+          </div>
+
+          <div className="text-white text-xs font-bold">
 
             {currentTime}
 
@@ -160,7 +262,7 @@ export default function HomePage() {
 
       </div>
 
-      {/* CONTENT */}
+      {/* BODY */}
 
       <div className="p-3">
 
@@ -170,7 +272,7 @@ export default function HomePage() {
 
           <div className="bg-white rounded-xl border border-zinc-300 p-3">
 
-            <div className="text-zinc-500 text-[10px] mb-1">
+            <div className="text-zinc-500 text-[10px]">
 
               API STATUS
 
@@ -186,7 +288,7 @@ export default function HomePage() {
 
           <div className="bg-white rounded-xl border border-zinc-300 p-3">
 
-            <div className="text-zinc-500 text-[10px] mb-1">
+            <div className="text-zinc-500 text-[10px]">
 
               LIVE MATCHES
 
@@ -202,7 +304,7 @@ export default function HomePage() {
 
           <div className="bg-white rounded-xl border border-zinc-300 p-3">
 
-            <div className="text-zinc-500 text-[10px] mb-1">
+            <div className="text-zinc-500 text-[10px]">
 
               TELEGRAM
 
@@ -218,9 +320,9 @@ export default function HomePage() {
 
           <div className="bg-white rounded-xl border border-zinc-300 p-3">
 
-            <div className="text-zinc-500 text-[10px] mb-1">
+            <div className="text-zinc-500 text-[10px]">
 
-              LAST UPDATE
+              UPDATE
 
             </div>
 
@@ -234,9 +336,215 @@ export default function HomePage() {
 
         </div>
 
-        {/* MATCH CARDS */}
+        {/* LIVE LOG */}
 
-        <div className="space-y-3">
+        <div className="bg-[#16233a] rounded-2xl p-3 mb-3">
+
+          <div className="text-cyan-400 font-bold text-xs mb-2">
+
+            LIVE ACTIVITY
+
+          </div>
+
+          <div className="space-y-1 max-h-[160px] overflow-auto">
+
+            {logs.map((log, index) => (
+
+              <div
+                key={index}
+                className="text-white text-[10px] font-mono border-b border-zinc-700 pb-1"
+              >
+
+                {log}
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
+        {/* DESKTOP TABLE */}
+
+        <div className="hidden md:block bg-white rounded-2xl border border-zinc-300 overflow-hidden">
+
+          <table className="w-full text-xs">
+
+            <thead className="bg-[#17233a] text-white">
+
+              <tr>
+
+                <th className="p-3 text-left">
+
+                  MATCH
+
+                </th>
+
+                <th className="p-3 text-center">
+
+                  MARKET
+
+                </th>
+
+                <th className="p-3 text-center">
+
+                  ODDS
+
+                </th>
+
+                <th className="p-3 text-center">
+
+                  MOVE
+
+                </th>
+
+                <th className="p-3 text-center">
+
+                  BOOK
+
+                </th>
+
+                <th className="p-3 text-center">
+
+                  STATUS
+
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {steamData.map((item, index) => (
+
+                <tr
+                  key={index}
+                  className="border-b border-zinc-200 hover:bg-zinc-50"
+                >
+
+                  <td className="p-3">
+
+                    <div className="font-bold text-red-500">
+
+                      {item.home_team}
+
+                    </div>
+
+                    <div className="text-blue-500 text-[10px]">
+
+                      vs {item.away_team}
+
+                    </div>
+
+                  </td>
+
+                  <td className="text-center font-bold">
+
+                    {item.market} {item.line}
+
+                  </td>
+
+                  <td className="text-center">
+
+                    <div
+
+                      className={`
+
+                        inline-block px-3 py-1 rounded-lg font-black animate-pulse
+
+                        ${item.direction === "UP"
+
+                          ?
+
+                          "bg-green-100 text-green-600"
+
+                          :
+
+                          "bg-red-100 text-red-600"
+
+                        }
+
+                      `}
+                    >
+
+                      {item.odds}
+
+                    </div>
+
+                  </td>
+
+                  <td
+
+                    className={`
+
+                      text-center font-bold
+
+                      ${item.direction === "UP"
+
+                        ?
+
+                        "text-green-600"
+
+                        :
+
+                        "text-red-600"
+
+                      }
+
+                    `}
+                  >
+
+                    {item.move}
+
+                  </td>
+
+                  <td className="text-center font-bold text-green-600">
+
+                    {item.bookmaker}
+
+                  </td>
+
+                  <td className="text-center">
+
+                    {
+
+                      item.status === "Steam Move"
+
+                        ?
+
+                        "🔥"
+
+                        :
+
+                        item.status === "Sharp Money"
+
+                        ?
+
+                        "💰"
+
+                        :
+
+                        "⚡"
+
+                    }
+
+                  </td>
+
+                </tr>
+
+              ))}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        {/* MOBILE CARDS */}
+
+        <div className="block md:hidden space-y-3">
 
           {steamData.map((item, index) => (
 
@@ -245,9 +553,7 @@ export default function HomePage() {
               className="bg-white rounded-2xl border border-zinc-300 p-3 shadow-sm"
             >
 
-              {/* HEADER */}
-
-              <div className="flex justify-between items-center mb-3">
+              <div className="flex justify-between items-center mb-2">
 
                 <div>
 
@@ -265,23 +571,19 @@ export default function HomePage() {
 
                 </div>
 
-                <div className="bg-green-600 text-white px-2 py-1 rounded-lg text-[10px] animate-pulse">
+                <div className="bg-green-600 text-white px-2 py-1 rounded-lg text-[10px]">
 
-                  🔴 LIVE
+                  LIVE
 
                 </div>
 
               </div>
 
-              {/* MARKET */}
-
               <div className="bg-zinc-100 rounded-xl p-2 text-center font-bold text-xs mb-3">
 
-                {item.market || "⚽ TÀI/XỈU 3.5"}
+                {item.market} {item.line}
 
               </div>
-
-              {/* ODDS */}
 
               <div className="flex items-center justify-center gap-2">
 
@@ -291,7 +593,7 @@ export default function HomePage() {
 
                     rounded-xl px-4 py-3 text-center font-black text-lg animate-pulse
 
-                    ${item.odds >= item.previous_odds
+                    ${item.direction === "UP"
 
                       ?
 
@@ -314,7 +616,7 @@ export default function HomePage() {
 
                   {
 
-                    item.odds >= item.previous_odds
+                    item.direction === "UP"
 
                       ?
 
@@ -330,51 +632,42 @@ export default function HomePage() {
 
               </div>
 
-              {/* PREVIOUS */}
-
-              <div className="mt-2 text-[10px] text-zinc-500 text-center">
-
-                Prev Odds: {item.previous_odds}
-
-              </div>
-
-              {/* BOOKMAKER */}
-
               <div className="grid grid-cols-3 gap-2 mt-3 text-[10px]">
 
                 <div className="bg-zinc-100 rounded-lg p-2 text-center">
 
-                  SBO 0.98
+                  Line {item.line}
+
+                </div>
+
+                <div
+
+                  className={`
+
+                    rounded-lg p-2 text-center font-bold
+
+                    ${item.direction === "UP"
+
+                      ?
+
+                      "bg-green-100 text-green-600"
+
+                      :
+
+                      "bg-red-100 text-red-600"
+
+                    }
+
+                  `}
+                >
+
+                  {item.move}
 
                 </div>
 
                 <div className="bg-zinc-100 rounded-lg p-2 text-center">
 
-                  SABA 0.95
-
-                </div>
-
-                <div className="bg-zinc-100 rounded-lg p-2 text-center">
-
-                  CMD 1.02
-
-                </div>
-
-              </div>
-
-              {/* FOOTER */}
-
-              <div className="mt-3 flex justify-between items-center">
-
-                <div className="text-green-600 font-bold text-xs">
-
-                  {item.bookmaker || "SBOBET"}
-
-                </div>
-
-                <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-2 py-1 rounded-xl text-[10px] font-bold animate-pulse">
-
-                  ⚡ {item.status || "Steam Move"}
+                  {item.bookmaker}
 
                 </div>
 
