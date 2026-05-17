@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { io } from "socket.io-client"
 
 export default function HomePage() {
 
@@ -8,7 +9,7 @@ export default function HomePage() {
     useState(false)
 
   const [steamData, setSteamData] =
-    useState<any[]>([])
+    useState<any[]>(([]))
 
   const [currentTime, setCurrentTime] =
     useState("")
@@ -22,14 +23,18 @@ export default function HomePage() {
 
       setLoggedIn(true)
 
-      loadSteam()
+      const socket = io(
+        "http://127.0.0.1:5000"
+      )
 
-      const interval =
-        setInterval(() => {
+      socket.on(
+        "steam_update",
+        (data) => {
 
-          loadSteam()
+          setSteamData(data)
 
-        }, 4000)
+        }
+      )
 
       const clock =
         setInterval(() => {
@@ -42,7 +47,7 @@ export default function HomePage() {
 
       return () => {
 
-        clearInterval(interval)
+        socket.disconnect()
 
         clearInterval(clock)
 
@@ -71,63 +76,6 @@ export default function HomePage() {
 
   }
 
-  const loadSteam = async () => {
-
-    try {
-
-      const res = await fetch(
-
-        "http://127.0.0.1:5000/steam"
-
-      )
-
-      const data = await res.json()
-
-      const uniqueMatches =
-        data.reduce(
-
-          (
-            acc: any[],
-            current: any
-          ) => {
-
-            const exists =
-              acc.find(
-
-                (item) =>
-
-                  item.home_team ===
-                    current.home_team &&
-
-                  item.away_team ===
-                    current.away_team
-
-              )
-
-            if (!exists) {
-
-              acc.push(current)
-
-            }
-
-            return acc
-
-          },
-
-          []
-
-        )
-
-      setSteamData(uniqueMatches)
-
-    } catch (err) {
-
-      console.log(err)
-
-    }
-
-  }
-
   const logout = () => {
 
     localStorage.removeItem(
@@ -147,11 +95,11 @@ export default function HomePage() {
 
   return (
 
-    <div className="min-h-screen bg-[#eef1f5] text-black overflow-x-auto">
+    <div className="min-h-screen bg-[#eef1f5] text-black overflow-x-hidden">
 
       {/* TOPBAR */}
 
-      <div className="h-[55px] bg-[#17233a] flex items-center justify-between px-3 border-b border-[#24324a] min-w-[900px]">
+      <div className="h-[55px] bg-[#17233a] flex items-center justify-between px-3 border-b border-[#24324a]">
 
         <div className="flex items-center gap-4">
 
@@ -159,13 +107,13 @@ export default function HomePage() {
 
             <span className="text-white">
 
-              Arb
+              Odds
 
             </span>
 
             <span className="text-cyan-400">
 
-              Scanner
+              Seokeo
 
             </span>
 
@@ -181,19 +129,13 @@ export default function HomePage() {
 
         <div className="flex items-center gap-2">
 
-          <div className="text-white text-xs">
-
-            vip123
-
-          </div>
-
           <a
             href="https://t.me/sokeoscanner"
             target="_blank"
             className="bg-[#243b63] hover:bg-[#2c4c7d] text-white px-2 py-1 rounded-lg text-xs border border-cyan-500"
           >
 
-            Telegram
+            💬 Telegram
 
           </a>
 
@@ -218,348 +160,201 @@ export default function HomePage() {
 
       </div>
 
-      <div className="flex min-w-[900px]">
+      {/* CONTENT */}
 
-        {/* SIDEBAR */}
+      <div className="p-3">
 
-        <div className="w-[180px] bg-[#f5f6f8] border-r border-zinc-300 min-h-screen p-2">
+        {/* STATUS */}
 
-          <div className="text-zinc-500 font-bold mb-3 text-xs">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
 
-            WORKFLOW
+          <div className="bg-white rounded-xl border border-zinc-300 p-3">
+
+            <div className="text-zinc-500 text-[10px] mb-1">
+
+              API STATUS
+
+            </div>
+
+            <div className="text-green-500 font-black text-sm animate-pulse">
+
+              ONLINE
+
+            </div>
 
           </div>
 
-          {[
+          <div className="bg-white rounded-xl border border-zinc-300 p-3">
 
-            "Workflow 1A",
+            <div className="text-zinc-500 text-[10px] mb-1">
 
-            "Workflow 1C",
+              LIVE MATCHES
 
-            "Workflow 1D",
+            </div>
 
-            "Workflow 2B",
+            <div className="font-black text-sm">
 
-            "Workflow 2C"
+              {steamData.length}
 
-          ].map((item, index) => (
+            </div>
+
+          </div>
+
+          <div className="bg-white rounded-xl border border-zinc-300 p-3">
+
+            <div className="text-zinc-500 text-[10px] mb-1">
+
+              TELEGRAM
+
+            </div>
+
+            <div className="text-cyan-500 font-black text-sm">
+
+              CONNECTED
+
+            </div>
+
+          </div>
+
+          <div className="bg-white rounded-xl border border-zinc-300 p-3">
+
+            <div className="text-zinc-500 text-[10px] mb-1">
+
+              LAST UPDATE
+
+            </div>
+
+            <div className="font-black text-xs">
+
+              {currentTime}
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* LIVE CARDS */}
+
+        <div className="space-y-3">
+
+          {steamData.map((item, index) => (
 
             <div
               key={index}
-              className={`rounded-xl p-2 mb-2 border transition-all cursor-pointer
-
-              ${
-                index === 4
-
-                  ?
-
-                  "border-blue-500 bg-white"
-
-                  :
-
-                  "border-zinc-300 bg-white hover:bg-zinc-100"
-
-              }`}
+              className="bg-white rounded-2xl border border-zinc-300 p-3 shadow-sm"
             >
 
-              <div className="font-bold text-sm mb-1">
+              {/* HEADER */}
 
-                {item}
+              <div className="flex justify-between items-center mb-3">
+
+                <div>
+
+                  <div className="font-bold text-red-500 text-sm">
+
+                    {item.home_team}
+
+                  </div>
+
+                  <div className="text-blue-500 text-xs">
+
+                    vs {item.away_team}
+
+                  </div>
+
+                </div>
+
+                <div className="bg-green-600 text-white px-2 py-1 rounded-lg text-[10px] animate-pulse">
+
+                  🔴 LIVE
+
+                </div>
 
               </div>
 
-              <div className="text-zinc-600 text-xs leading-5">
+              {/* MARKET */}
 
-                KSPORT vs CMD
+              <div className="grid grid-cols-2 gap-2 text-xs">
+
+                <div className="bg-zinc-100 rounded-xl p-2 text-center font-bold">
+
+                  {item.market || "O/U 3.5"}
+
+                </div>
+
+                <div
+
+                  className={`
+
+                    rounded-xl p-2 text-center font-black animate-pulse
+
+                    ${item.odds >= 1
+
+                      ?
+
+                      "bg-green-100 text-green-600"
+
+                      :
+
+                      "bg-red-100 text-red-600"
+
+                    }
+
+                  `}
+                >
+
+                  {item.odds}
+
+                </div>
+
+              </div>
+
+              {/* BOOKMAKER */}
+
+              <div className="grid grid-cols-3 gap-2 mt-3 text-[10px]">
+
+                <div className="bg-zinc-100 rounded-lg p-2 text-center">
+
+                  SBO 0.98
+
+                </div>
+
+                <div className="bg-zinc-100 rounded-lg p-2 text-center">
+
+                  SABA 0.95
+
+                </div>
+
+                <div className="bg-zinc-100 rounded-lg p-2 text-center">
+
+                  CMD 1.02
+
+                </div>
+
+              </div>
+
+              {/* FOOTER */}
+
+              <div className="mt-3 flex justify-between items-center">
+
+                <div className="text-green-600 font-bold text-xs">
+
+                  {item.bookmaker || "SBOBET"}
+
+                </div>
+
+                <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-2 py-1 rounded-xl text-[10px] font-bold animate-pulse">
+
+                  ⚡ STEAM MOVE
+
+                </div>
 
               </div>
 
             </div>
 
           ))}
-
-        </div>
-
-        {/* CONTENT */}
-
-        <div className="flex-1 p-2">
-
-          {/* STATS */}
-
-          <div className="grid grid-cols-5 gap-2 mb-2">
-
-            <div className="bg-white rounded-xl border border-zinc-300 p-2">
-
-              <div className="text-zinc-500 text-[10px] mb-1">
-
-                API STATUS
-
-              </div>
-
-              <div className="text-green-500 font-black text-sm">
-
-                ONLINE
-
-              </div>
-
-            </div>
-
-            <div className="bg-white rounded-xl border border-zinc-300 p-2">
-
-              <div className="text-zinc-500 text-[10px] mb-1">
-
-                MATCHES
-
-              </div>
-
-              <div className="font-black text-sm">
-
-                156
-
-              </div>
-
-            </div>
-
-            <div className="bg-white rounded-xl border border-zinc-300 p-2">
-
-              <div className="text-zinc-500 text-[10px] mb-1">
-
-                OPPS
-
-              </div>
-
-              <div className="font-black text-sm">
-
-                {steamData.length}
-
-              </div>
-
-            </div>
-
-            <div className="bg-white rounded-xl border border-zinc-300 p-2">
-
-              <div className="text-zinc-500 text-[10px] mb-1">
-
-                RATE
-
-              </div>
-
-              <div className="font-black text-sm text-green-500">
-
-                87.2%
-
-              </div>
-
-            </div>
-
-            <div className="bg-white rounded-xl border border-zinc-300 p-2">
-
-              <div className="text-zinc-500 text-[10px] mb-1">
-
-                UPDATE
-
-              </div>
-
-              <div className="font-black text-xs">
-
-                {currentTime}
-
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* LOG */}
-
-          <div className="bg-[#16233a] rounded-xl p-3 mb-2 text-white font-mono text-xs leading-6">
-
-            [22:04:47] ⚡ BTI: nhận 29 trận <br />
-
-            [22:04:49] ⚡ SABA: nhận 42 trận <br />
-
-            [22:04:49] ⚡ Live scanner running
-
-          </div>
-
-          {/* LIVE */}
-
-          <div className="bg-white border border-zinc-300 rounded-xl overflow-x-auto">
-
-            <div className="flex items-center gap-2 px-3 py-2 border-b border-zinc-300">
-
-              <div className="text-yellow-500 text-sm">
-
-                ⚡
-
-              </div>
-
-              <div className="text-sm font-bold">
-
-                LIVE OPPORTUNITIES
-
-              </div>
-
-              <div className="bg-blue-500 text-white px-2 py-1 rounded-full text-[10px] font-bold">
-
-                {steamData.length}
-
-              </div>
-
-            </div>
-
-            <table className="min-w-[900px] w-full text-xs">
-
-              <thead className="bg-[#f5f6f8] text-zinc-600">
-
-                <tr>
-
-                  <th className="text-left p-2">
-
-                    MATCH
-
-                  </th>
-
-                  <th className="text-left p-2">
-
-                    TIME
-
-                  </th>
-
-                  <th className="text-left p-2">
-
-                    TYPE
-
-                  </th>
-
-                  <th className="text-left p-2">
-
-                    LINE
-
-                  </th>
-
-                  <th className="text-left p-2">
-
-                    BOOK
-
-                  </th>
-
-                  <th className="text-left p-2">
-
-                    ODDS
-
-                  </th>
-
-                  <th className="text-left p-2">
-
-                    STATUS
-
-                  </th>
-
-                </tr>
-
-              </thead>
-
-              <tbody>
-
-                {steamData.map((item, index) => (
-
-                  <tr
-                    key={index}
-                    className="border-t border-zinc-300 hover:bg-zinc-50"
-                  >
-
-                    <td className="p-2">
-
-                      <div className="text-red-500 font-bold text-sm">
-
-                        {item.home_team}
-
-                      </div>
-
-                      <div className="text-blue-500 text-xs">
-
-                        vs {item.away_team}
-
-                      </div>
-
-                    </td>
-
-                    <td className="p-2">
-
-                      <div className="flex items-center gap-1">
-
-                        <div className="bg-green-700 text-white px-2 py-1 rounded text-[10px]">
-
-                          LIVE
-
-                        </div>
-
-                        <div className="text-red-500 font-bold text-xs">
-
-                          11'
-
-                        </div>
-
-                      </div>
-
-                    </td>
-
-                    <td className="p-2">
-
-                      <div className="bg-blue-100 border border-blue-400 text-blue-700 px-2 py-1 rounded-lg text-center font-bold text-[10px] w-fit">
-
-                        FT O/U
-
-                      </div>
-
-                    </td>
-
-                    <td className="p-2 font-bold text-xs">
-
-                      3.5
-
-                    </td>
-
-                    <td className="p-2">
-
-                      <div className="bg-green-100 border border-green-400 text-green-700 px-2 py-1 rounded-lg text-[10px] w-fit font-bold">
-
-                        KSPORT
-
-                      </div>
-
-                    </td>
-
-                    <td className="p-2">
-
-                      <div className="text-blue-500 font-black text-sm">
-
-                        {item.odds || "0.95"}
-
-                      </div>
-
-                    </td>
-
-                    <td className="p-2">
-
-                      <div className="bg-yellow-100 border border-yellow-500 text-yellow-700 px-2 py-1 rounded-xl text-center font-bold text-[10px] w-fit">
-
-                        Steam Move
-
-                      </div>
-
-                    </td>
-
-                  </tr>
-
-                ))}
-
-              </tbody>
-
-            </table>
-
-          </div>
 
         </div>
 
