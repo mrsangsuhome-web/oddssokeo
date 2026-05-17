@@ -78,19 +78,32 @@ export default function LoginPage() {
 
     <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4">
 
-      <div className="bg-[#172033] border border-zinc-700 rounded-2xl p-6 w-full max-w-sm">
+      <div className="bg-[#172033] border border-zinc-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
 
-        <div className="text-center mb-6">
+        {/* LOGO */}
 
-          <div className="text-2xl font-black text-white mb-2">
+        <div className="text-center mb-8">
 
-            Arb Scanner
+          <div className="text-3xl font-black mb-2">
+
+            <span className="text-white">
+
+              Arb
+
+            </span>
+
+            <span className="text-cyan-400">
+
+              Scanner
+
+            </span>
 
           </div>
 
           <div className="text-zinc-400 text-sm">
 
-            Login Dashboard
+            Live Scanner Dashboard
+
           </div>
 
         </div>
@@ -115,14 +128,14 @@ export default function LoginPage() {
               setUsername(e.target.value)
             }
             placeholder="Nhập username"
-            className="w-full bg-[#0f172a] border border-zinc-700 rounded-xl px-4 py-3 text-white outline-none"
+            className="w-full bg-[#0f172a] border border-zinc-700 rounded-xl px-4 py-3 text-white outline-none focus:border-cyan-500"
           />
 
         </div>
 
         {/* PASSWORD */}
 
-        <div className="mb-5">
+        <div className="mb-6">
 
           <div className="text-zinc-400 text-sm mb-2">
 
@@ -140,7 +153,7 @@ export default function LoginPage() {
               setPassword(e.target.value)
             }
             placeholder="Nhập password"
-            className="w-full bg-[#0f172a] border border-zinc-700 rounded-xl px-4 py-3 text-white outline-none"
+            className="w-full bg-[#0f172a] border border-zinc-700 rounded-xl px-4 py-3 text-white outline-none focus:border-cyan-500"
           />
 
         </div>
@@ -161,38 +174,12 @@ export default function LoginPage() {
         <a
           href="https://t.me/sokeoscanner"
           target="_blank"
-          className="block text-center mt-4 text-cyan-400 text-sm"
+          className="block text-center mt-5 text-cyan-400 text-sm hover:text-cyan-300"
         >
 
           Join Telegram
 
         </a>
-
-        {/* DEMO ACCOUNTS */}
-
-        <div className="mt-6 bg-[#0f172a] rounded-xl p-4 border border-zinc-700">
-
-          <div className="text-zinc-400 text-xs mb-3">
-
-            Demo Accounts
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-[11px] text-zinc-300">
-
-            <div>admin / 123456</div>
-            <div>vip1 / 123456</div>
-            <div>vip2 / 123456</div>
-            <div>vip3 / 123456</div>
-            <div>vip4 / 123456</div>
-            <div>vip5 / 123456</div>
-            <div>vip6 / 123456</div>
-            <div>vip7 / 123456</div>
-            <div>vip8 / 123456</div>
-            <div>vip9 / 123456</div>
-
-          </div>
-
-        </div>
 
       </div>
 
