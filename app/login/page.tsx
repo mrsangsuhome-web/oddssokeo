@@ -4,81 +4,71 @@ import { useState } from "react"
 
 export default function LoginPage() {
 
-  console.log("LOGIN PAGE ACTIVE")
-
   const [username, setUsername] =
     useState("")
 
   const [password, setPassword] =
     useState("")
 
-  const [message, setMessage] =
-    useState("")
+  const users = [
 
-  const login = async () => {
+    { username: "admin", password: "123456" },
 
-    console.log("LOGIN CLICKED")
+    { username: "vip1", password: "123456" },
 
-    try {
+    { username: "vip2", password: "123456" },
 
-      const res = await fetch(
+    { username: "vip3", password: "123456" },
 
-        "http://127.0.0.1:5000/login",
+    { username: "vip4", password: "123456" },
 
-        {
+    { username: "vip5", password: "123456" },
 
-          method: "POST",
+    { username: "vip6", password: "123456" },
 
-          headers: {
+    { username: "vip7", password: "123456" },
 
-            "Content-Type":
-              "application/json"
+    { username: "vip8", password: "123456" },
 
-          },
+    { username: "vip9", password: "123456" }
 
-          body: JSON.stringify({
+  ]
 
-            username,
+  const handleLogin = async () => {
 
-            password
+    const foundUser = users.find(
 
-          })
+      (u) =>
 
-        }
+        u.username === username &&
+
+        u.password === password
+
+    )
+
+    if (foundUser) {
+
+      localStorage.setItem(
+
+        "loggedIn",
+
+        "true"
+
+      )
+
+      localStorage.setItem(
+
+        "username",
+
+        foundUser.username
 
       )
 
-      const data = await res.json()
+      window.location.href = "/"
 
-      console.log(data)
+    } else {
 
-      if (data.success) {
-
-        localStorage.setItem(
-
-          "loggedIn",
-
-          "true"
-
-        )
-
-        window.location.href = "/"
-
-      } else {
-
-        setMessage(data.message)
-
-      }
-
-    } catch (err) {
-
-      console.log(err)
-
-      setMessage(
-
-        "Cannot connect server"
-
-      )
+      alert("Sai tài khoản hoặc mật khẩu")
 
     }
 
@@ -86,70 +76,123 @@ export default function LoginPage() {
 
   return (
 
-    <div className="min-h-screen flex items-center justify-center bg-[#eef1f5]">
+    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4">
 
-      <div className="bg-white p-10 rounded-2xl border border-zinc-300 w-[420px]">
+      <div className="bg-[#172033] border border-zinc-700 rounded-2xl p-6 w-full max-w-sm">
 
-        <h1 className="text-4xl font-bold text-blue-600 mb-8 text-center">
+        <div className="text-center mb-6">
 
-          Login
+          <div className="text-2xl font-black text-white mb-2">
 
-        </h1>
+            Arb Scanner
 
-        <input
-          type="text"
-          placeholder="Username"
-          autoComplete="username"
-          value={username}
-          onChange={(e) =>
-            setUsername(e.target.value)
-          }
-          className="w-full border border-zinc-300 rounded-xl px-4 py-3 mb-4"
-        />
+          </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          autoComplete="current-password"
-          value={password}
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
-          className="w-full border border-zinc-300 rounded-xl px-4 py-3 mb-4"
-        />
+          <div className="text-zinc-400 text-sm">
+
+            Login Dashboard
+          </div>
+
+        </div>
+
+        {/* USERNAME */}
+
+        <div className="mb-4">
+
+          <div className="text-zinc-400 text-sm mb-2">
+
+            Username
+
+          </div>
+
+          <input
+            type="text"
+            id="username"
+            name="username"
+            autoComplete="username"
+            value={username}
+            onChange={(e) =>
+              setUsername(e.target.value)
+            }
+            placeholder="Nhập username"
+            className="w-full bg-[#0f172a] border border-zinc-700 rounded-xl px-4 py-3 text-white outline-none"
+          />
+
+        </div>
+
+        {/* PASSWORD */}
+
+        <div className="mb-5">
+
+          <div className="text-zinc-400 text-sm mb-2">
+
+            Password
+
+          </div>
+
+          <input
+            type="password"
+            id="password"
+            name="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+            placeholder="Nhập password"
+            className="w-full bg-[#0f172a] border border-zinc-700 rounded-xl px-4 py-3 text-white outline-none"
+          />
+
+        </div>
+
+        {/* LOGIN */}
 
         <button
-          onClick={login}
-          className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold"
+          onClick={handleLogin}
+          className="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 rounded-xl transition-all"
         >
 
           LOGIN
 
         </button>
 
-        {message && (
+        {/* TELEGRAM */}
 
-          <div className="mt-5 text-center text-red-500 font-bold">
+        <a
+          href="https://t.me/sokeoscanner"
+          target="_blank"
+          className="block text-center mt-4 text-cyan-400 text-sm"
+        >
 
-            {message}
+          Join Telegram
+
+        </a>
+
+        {/* DEMO ACCOUNTS */}
+
+        <div className="mt-6 bg-[#0f172a] rounded-xl p-4 border border-zinc-700">
+
+          <div className="text-zinc-400 text-xs mb-3">
+
+            Demo Accounts
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 text-[11px] text-zinc-300">
+
+            <div>admin / 123456</div>
+            <div>vip1 / 123456</div>
+            <div>vip2 / 123456</div>
+            <div>vip3 / 123456</div>
+            <div>vip4 / 123456</div>
+            <div>vip5 / 123456</div>
+            <div>vip6 / 123456</div>
+            <div>vip7 / 123456</div>
+            <div>vip8 / 123456</div>
+            <div>vip9 / 123456</div>
 
           </div>
 
-        )}
-
-        <button
-          onClick={() => {
-
-            window.location.href =
-              "/register"
-
-          }}
-          className="w-full mt-5 bg-green-600 text-white py-3 rounded-xl font-bold"
-        >
-
-          CREATE ACCOUNT
-
-        </button>
+        </div>
 
       </div>
 

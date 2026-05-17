@@ -29,7 +29,7 @@ export default function HomePage() {
 
         loadSteam()
 
-      }, 5000)
+      }, 4000)
 
       const clock = setInterval(() => {
 
@@ -59,21 +59,10 @@ export default function HomePage() {
 
     const now = new Date()
 
-    const time = now.toLocaleTimeString(
-      "vi-VN",
-      {
-
-        hour12: false
-
-      }
-    )
-
-    const date = now.toLocaleDateString(
-      "vi-VN"
-    )
-
     setCurrentTime(
-      `${date} ${time}`
+
+      now.toLocaleTimeString("vi-VN")
+
     )
 
   }
@@ -139,84 +128,50 @@ export default function HomePage() {
 
   return (
 
-    <div className="min-h-screen bg-[#eceef2] text-black">
+    <div className="min-h-screen bg-[#eceef2] text-black text-xs">
 
       {/* TOPBAR */}
 
-      <div className="h-[70px] bg-[#17233a] border-b border-[#25324d] flex items-center justify-between px-8">
+      <div className="h-[50px] bg-[#17233a] border-b border-[#25324d] flex items-center justify-between px-3">
 
-        <div className="flex items-center gap-10">
+        <div className="text-sm font-black">
 
-          <div className="text-3xl font-black">
+          <span className="text-white">
 
-            <span className="text-white">
+            Arb
 
-              Arb
+          </span>
 
-            </span>
+          <span className="text-blue-400">
 
-            <span className="text-blue-400">
+            Scanner
 
-              Scanner
-
-            </span>
-
-          </div>
-
-          <div className="text-cyan-400 border-b-2 border-cyan-400 pb-1 text-lg">
-
-            Live Scanner
-
-          </div>
+          </span>
 
         </div>
 
-        <div className="flex items-center gap-4">
-
-          <div className="text-zinc-300">
-
-            vip123
-
-          </div>
-
-          <button className="bg-[#253cff] hover:bg-blue-700 text-white px-5 py-2 rounded-lg">
-
-            📊 Monitor
-
-          </button>
+        <div className="flex items-center gap-2">
 
           <a
             href="https://t.me/sokeoscanner"
             target="_blank"
-            className="bg-cyan-500 hover:bg-cyan-600 text-white px-5 py-2 rounded-lg"
+            className="bg-cyan-500 text-white px-2 py-1 rounded"
           >
 
-            💬 Chat Bot
-
-          </a>
-
-          <a
-            href="https://t.me/sokeoscanner"
-            target="_blank"
-            className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg"
-          >
-
-            🚀 Join Telegram
+            Telegram
 
           </a>
 
           <button
             onClick={logout}
-            className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg"
+            className="bg-red-500 text-white px-2 py-1 rounded"
           >
 
-            ⏻ Logout
+            Out
 
           </button>
 
-          <div className="flex items-center gap-3 text-white text-xl font-bold">
-
-            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+          <div className="text-white text-[10px]">
 
             {currentTime}
 
@@ -226,345 +181,124 @@ export default function HomePage() {
 
       </div>
 
-      <div className="flex">
+      {/* CONTENT */}
 
-        {/* SIDEBAR */}
+      <div className="p-2">
 
-        <div className="w-[260px] bg-[#f4f5f7] border-r border-zinc-300 min-h-screen p-5">
+        {/* LOG */}
 
-          <div className="text-zinc-500 font-bold mb-5">
+        <div className="bg-[#1d2b45] rounded-lg p-2 mb-2 text-white font-mono text-[10px] leading-5">
 
-            WORKFLOW
+          ⚡ Live Scanner Running <br />
+
+          ⚡ API Online <br />
+
+          ⚡ Telegram Connected
+
+        </div>
+
+        {/* TITLE */}
+
+        <div className="flex items-center gap-2 mb-2">
+
+          <div className="text-yellow-500 text-sm">
+
+            ⚡
 
           </div>
 
-          {[
+          <div className="text-sm font-bold">
 
-            "Asian Scanner",
+            LIVE
 
-            "Steam Move",
+          </div>
 
-            "Sharp Money",
+          <div className="bg-blue-500 text-white px-2 py-1 rounded-full text-[10px] font-bold">
 
-            "Realtime Odds",
+            {steamData.length}
 
-            "Live Market"
+          </div>
 
-          ].map((item, index) => (
+        </div>
+
+        {/* MATCHES */}
+
+        <div className="space-y-2">
+
+          {steamData.map((item, index) => (
 
             <div
               key={index}
-              className={`rounded-xl p-4 mb-4 border cursor-pointer transition-all
-              
-              ${
-                index === 4
-                  ? "border-blue-500 bg-white"
-                  : "border-zinc-300 bg-white hover:bg-zinc-100"
-              }`}
+              className="bg-white border border-zinc-300 rounded-lg p-2"
             >
 
-              <div className="font-bold text-2xl mb-3">
+              <div className="flex justify-between items-center mb-1">
 
-                {item}
+                <div>
+
+                  <div className="text-red-500 font-bold text-xs">
+
+                    {item.home_team || "Home"}
+
+                  </div>
+
+                  <div className="text-blue-500 text-[11px]">
+
+                    vs {item.away_team || "Away"}
+
+                  </div>
+
+                </div>
+
+                <div className="bg-green-600 text-white px-2 py-1 rounded text-[10px]">
+
+                  LIVE
+
+                </div>
 
               </div>
 
-              <div className="text-zinc-600 text-lg leading-8">
+              <div className="grid grid-cols-4 gap-1 mt-2 text-[10px]">
 
-                KSPORT vs CMD / SABA
+                <div className="bg-zinc-100 rounded p-1 text-center">
+
+                  FT O/U
+                </div>
+
+                <div className="bg-zinc-100 rounded p-1 text-center font-bold">
+
+                  3.5
+                </div>
+
+                <div className="bg-zinc-100 rounded p-1 text-center">
+
+                  KSPORT
+                </div>
+
+                <div className="bg-zinc-100 rounded p-1 text-center text-blue-500 font-bold">
+
+                  {item.odds || "0.95"}
+                </div>
+
+              </div>
+
+              <div className="mt-2 flex justify-between items-center">
+
+                <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-2 py-1 rounded text-[10px]">
+
+                  Steam Move
+                </div>
+
+                <div className="text-zinc-500 text-[10px]">
+
+                  {currentTime}
+                </div>
 
               </div>
 
             </div>
 
           ))}
-
-        </div>
-
-        {/* CONTENT */}
-
-        <div className="flex-1 p-5">
-
-          {/* LOG PANEL */}
-
-          <div className="bg-[#1d2b45] rounded-xl p-5 mb-5 text-white font-mono text-lg leading-10">
-
-            [22:04:47] ⚡ BTI: nhận 29 trận <br />
-
-            [22:04:49] ⚡ SABA: nhận 42 trận <br />
-
-            [22:04:49] ⚡ Live Scanner Running
-
-          </div>
-
-          {/* LIVE OPPORTUNITIES */}
-
-          <div className="bg-white border border-zinc-300 rounded-xl overflow-hidden mb-5">
-
-            <div className="flex items-center gap-3 px-5 py-4 border-b border-zinc-300">
-
-              <div className="text-yellow-500 text-2xl">
-
-                ⚡
-
-              </div>
-
-              <div className="text-3xl font-bold">
-
-                LIVE OPPORTUNITIES
-
-              </div>
-
-              <div className="bg-blue-500 text-white px-3 py-1 rounded-full font-bold">
-
-                {steamData.length}
-
-              </div>
-
-            </div>
-
-            <div className="overflow-x-auto">
-
-              <table className="w-full min-w-[1700px]">
-
-                <thead className="bg-[#f3f4f6] text-zinc-600 text-lg">
-
-                  <tr>
-
-                    <th className="text-left p-4">
-
-                      MATCH
-
-                    </th>
-
-                    <th className="text-left p-4">
-
-                      TIME
-
-                    </th>
-
-                    <th className="text-left p-4">
-
-                      TYPE
-
-                    </th>
-
-                    <th className="text-left p-4">
-
-                      LINE
-
-                    </th>
-
-                    <th className="text-left p-4">
-
-                      BOOK A
-
-                    </th>
-
-                    <th className="text-left p-4">
-
-                      ODDS A
-
-                    </th>
-
-                    <th className="text-left p-4">
-
-                      BOOK B
-
-                    </th>
-
-                    <th className="text-left p-4">
-
-                      ODDS B
-
-                    </th>
-
-                    <th className="text-left p-4">
-
-                      STATUS
-
-                    </th>
-
-                    <th className="text-left p-4">
-
-                      FOUND
-
-                    </th>
-
-                  </tr>
-
-                </thead>
-
-                <tbody>
-
-                  {steamData.map((item, index) => (
-
-                    <tr
-                      key={index}
-                      className="border-t border-zinc-300 hover:bg-zinc-50"
-                    >
-
-                      {/* MATCH */}
-
-                      <td className="p-4">
-
-                        <div className="text-red-500 font-bold text-2xl">
-
-                          {item.home_team || "Home"}
-
-                        </div>
-
-                        <div className="text-blue-500 text-xl">
-
-                          vs {item.away_team || "Away"}
-
-                        </div>
-
-                      </td>
-
-                      {/* TIME */}
-
-                      <td className="p-4">
-
-                        <div className="flex items-center gap-3 mb-2">
-
-                          <div className="bg-green-700 text-white px-2 py-1 rounded text-sm font-bold">
-
-                            LIVE
-
-                          </div>
-
-                          <div className="text-red-500 font-bold text-2xl">
-
-                            11'
-
-                          </div>
-
-                        </div>
-
-                        <div className="text-zinc-500 text-sm">
-
-                          {new Date().toLocaleDateString("vi-VN")}
-
-                        </div>
-
-                        <div className="text-zinc-500 text-sm">
-
-                          {new Date().toLocaleTimeString("vi-VN")}
-
-                        </div>
-
-                      </td>
-
-                      {/* TYPE */}
-
-                      <td className="p-4">
-
-                        <div className="bg-blue-100 border border-blue-400 text-blue-700 px-3 py-2 rounded-lg text-center font-bold">
-
-                          FT O/U
-
-                        </div>
-
-                      </td>
-
-                      {/* LINE */}
-
-                      <td className="p-4 text-3xl font-black text-[#17233a]">
-
-                        3.5
-
-                      </td>
-
-                      {/* BOOK A */}
-
-                      <td className="p-4">
-
-                        <div className="bg-green-100 border border-green-400 text-green-700 px-3 py-2 rounded-lg text-center font-bold">
-
-                          KSPORT
-
-                        </div>
-
-                      </td>
-
-                      {/* ODDS A */}
-
-                      <td className="p-4">
-
-                        <div className="text-blue-500 text-3xl font-black">
-
-                          {item.odds || "0.78"}
-
-                        </div>
-
-                      </td>
-
-                      {/* BOOK B */}
-
-                      <td className="p-4">
-
-                        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-3 py-2 rounded-lg text-center font-bold">
-
-                          SABA
-
-                        </div>
-
-                      </td>
-
-                      {/* ODDS B */}
-
-                      <td className="p-4">
-
-                        <div className="text-blue-500 text-3xl font-black">
-
-                          0.95
-
-                        </div>
-
-                      </td>
-
-                      {/* STATUS */}
-
-                      <td className="p-4">
-
-                        <div className="bg-yellow-100 border border-yellow-500 text-yellow-700 px-4 py-3 rounded-xl text-center font-bold text-lg">
-
-                          Steam Move (+1.73)
-
-                        </div>
-
-                      </td>
-
-                      {/* FOUND */}
-
-                      <td className="p-4 text-zinc-500">
-
-                        <div className="text-xl">
-
-                          {currentTime}
-
-                        </div>
-
-                        <div>
-
-                          KSPORT 1.1s
-
-                        </div>
-
-                      </td>
-
-                    </tr>
-
-                  ))}
-
-                </tbody>
-
-              </table>
-
-            </div>
-
-          </div>
 
         </div>
 
