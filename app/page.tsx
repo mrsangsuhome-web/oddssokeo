@@ -9,7 +9,7 @@ export default function HomePage() {
     useState(false)
 
   const [steamData, setSteamData] =
-    useState<any[]>(([]))
+    useState<any[]>([])
 
   const [currentTime, setCurrentTime] =
     useState("")
@@ -95,7 +95,7 @@ export default function HomePage() {
 
   return (
 
-    <div className="min-h-screen bg-[#eef1f5] text-black overflow-x-hidden">
+    <div className="min-h-screen bg-[#eef1f5] text-black">
 
       {/* TOPBAR */}
 
@@ -234,7 +234,7 @@ export default function HomePage() {
 
         </div>
 
-        {/* LIVE CARDS */}
+        {/* MATCH CARDS */}
 
         <div className="space-y-3">
 
@@ -275,21 +275,23 @@ export default function HomePage() {
 
               {/* MARKET */}
 
-              <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="bg-zinc-100 rounded-xl p-2 text-center font-bold text-xs mb-3">
 
-                <div className="bg-zinc-100 rounded-xl p-2 text-center font-bold">
+                {item.market || "⚽ TÀI/XỈU 3.5"}
 
-                  {item.market || "O/U 3.5"}
+              </div>
 
-                </div>
+              {/* ODDS */}
+
+              <div className="flex items-center justify-center gap-2">
 
                 <div
 
                   className={`
 
-                    rounded-xl p-2 text-center font-black animate-pulse
+                    rounded-xl px-4 py-3 text-center font-black text-lg animate-pulse
 
-                    ${item.odds >= 1
+                    ${item.odds >= item.previous_odds
 
                       ?
 
@@ -307,6 +309,32 @@ export default function HomePage() {
                   {item.odds}
 
                 </div>
+
+                <div className="text-lg font-bold">
+
+                  {
+
+                    item.odds >= item.previous_odds
+
+                      ?
+
+                      "⬆️"
+
+                      :
+
+                      "⬇️"
+
+                  }
+
+                </div>
+
+              </div>
+
+              {/* PREVIOUS */}
+
+              <div className="mt-2 text-[10px] text-zinc-500 text-center">
+
+                Prev Odds: {item.previous_odds}
 
               </div>
 
@@ -346,7 +374,7 @@ export default function HomePage() {
 
                 <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-2 py-1 rounded-xl text-[10px] font-bold animate-pulse">
 
-                  ⚡ STEAM MOVE
+                  ⚡ {item.status || "Steam Move"}
 
                 </div>
 
