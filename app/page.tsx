@@ -5,8 +5,14 @@ import { io } from "socket.io-client"
 
 export default function HomePage() {
 
+  const [mounted, setMounted] =
+    useState(false)
+
   const [loggedIn, setLoggedIn] =
     useState(false)
+
+  const [loading, setLoading] =
+    useState(true)
 
   const [steamData, setSteamData] =
     useState<any[]>([])
@@ -18,9 +24,21 @@ export default function HomePage() {
     useState("")
 
   const [socketStatus, setSocketStatus] =
-    useState("CONNECTED")
+    useState("CONNECTING")
 
   useEffect(() => {
+
+    setMounted(true)
+
+  }, [])
+
+  useEffect(() => {
+
+    if (!mounted) {
+
+      return
+
+    }
 
     const auth =
       localStorage.getItem("loggedIn")
@@ -30,7 +48,12 @@ export default function HomePage() {
       setLoggedIn(true)
 
       const socket = io(
+
+        process.env
+          .NEXT_PUBLIC_API_URL ||
+
         "http://127.0.0.1:5001"
+
       )
 
       socket.on(
@@ -40,6 +63,8 @@ export default function HomePage() {
           setSocketStatus(
             "CONNECTED"
           )
+
+          setLoading(false)
 
         }
       )
@@ -71,27 +96,6 @@ export default function HomePage() {
         (data) => {
 
           setSteamData(data)
-
-          const bigMove = data.some(
-
-            (item: any) =>
-
-              Math.abs(
-                parseFloat(item.move)
-              ) >= 0.10
-
-          )
-
-          if (bigMove) {
-
-            const audio =
-              new Audio("/alert.mp3")
-
-            audio.volume = 0.4
-
-            audio.play()
-
-          }
 
         }
       )
@@ -135,7 +139,7 @@ export default function HomePage() {
 
     }
 
-  }, [])
+  }, [mounted])
 
   const logout = () => {
 
@@ -148,6 +152,36 @@ export default function HomePage() {
 
   }
 
+  if (!mounted) {
+
+    return null
+
+  }
+
+  if (loading) {
+
+    return (
+
+      <div className="min-h-screen bg-[#0f172a] flex items-center justify-center">
+
+        <div className="text-center">
+
+          <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+
+          <div className="text-cyan-400 font-bold">
+
+            Connecting Scanner...
+
+          </div>
+
+        </div>
+
+      </div>
+
+    )
+
+  }
+
   if (!loggedIn) {
 
     return null
@@ -156,9 +190,7 @@ export default function HomePage() {
 
   return (
 
-    <div className="min-h-screen bg-[#eef1f5] text-black">
-
-      {/* TOPBAR */}
+    <div className="min-h-screen bg-[#eef1f5] text-black overflow-x-hidden">
 
       <div className="h-[55px] bg-[#17233a] flex items-center justify-between px-3 border-b border-[#24324a]">
 
@@ -177,12 +209,6 @@ export default function HomePage() {
               Seokeo
 
             </span>
-
-          </div>
-
-          <div className="text-cyan-400 border-b-2 border-cyan-400 pb-1 text-xs font-bold">
-
-            LIVE SCANNER
 
           </div>
 
@@ -262,11 +288,7 @@ export default function HomePage() {
 
       </div>
 
-      {/* BODY */}
-
       <div className="p-3">
-
-        {/* STATUS */}
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
 
@@ -278,7 +300,7 @@ export default function HomePage() {
 
             </div>
 
-            <div className="text-green-500 font-black text-sm animate-pulse">
+            <div className="text-green-500 font-black text-sm">
 
               ONLINE
 
@@ -336,8 +358,6 @@ export default function HomePage() {
 
         </div>
 
-        {/* LIVE LOG */}
-
         <div className="bg-[#16233a] rounded-2xl p-3 mb-3">
 
           <div className="text-cyan-400 font-bold text-xs mb-2">
@@ -346,7 +366,7 @@ export default function HomePage() {
 
           </div>
 
-          <div className="space-y-1 max-h-[160px] overflow-auto">
+          <div className="space-y-1 max-h-[160px] overflow-y-auto scroll-smooth">
 
             {logs.map((log, index) => (
 
@@ -365,11 +385,9 @@ export default function HomePage() {
 
         </div>
 
-        {/* DESKTOP TABLE */}
+        <div className="overflow-x-auto hidden md:block">
 
-        <div className="hidden md:block bg-white rounded-2xl border border-zinc-300 overflow-hidden">
-
-          <table className="w-full text-xs">
+          <table className="w-full text-xs bg-white rounded-2xl overflow-hidden">
 
             <thead className="bg-[#17233a] text-white">
 
@@ -402,12 +420,6 @@ export default function HomePage() {
                 <th className="p-3 text-center">
 
                   BOOK
-
-                </th>
-
-                <th className="p-3 text-center">
-
-                  STATUS
 
                 </th>
 
@@ -506,32 +518,6 @@ export default function HomePage() {
 
                   </td>
 
-                  <td className="text-center">
-
-                    {
-
-                      item.status === "Steam Move"
-
-                        ?
-
-                        "🔥"
-
-                        :
-
-                        item.status === "Sharp Money"
-
-                        ?
-
-                        "💰"
-
-                        :
-
-                        "⚡"
-
-                    }
-
-                  </td>
-
                 </tr>
 
               ))}
@@ -542,9 +528,7 @@ export default function HomePage() {
 
         </div>
 
-        {/* MOBILE CARDS */}
-
-        <div className="block md:hidden space-y-3">
+        <div className="block md:hidden space-y-3 mt-3">
 
           {steamData.map((item, index) => (
 
@@ -612,31 +596,13 @@ export default function HomePage() {
 
                 </div>
 
-                <div className="text-lg font-bold">
-
-                  {
-
-                    item.direction === "UP"
-
-                      ?
-
-                      "⬆️"
-
-                      :
-
-                      "⬇️"
-
-                  }
-
-                </div>
-
               </div>
 
               <div className="grid grid-cols-3 gap-2 mt-3 text-[10px]">
 
                 <div className="bg-zinc-100 rounded-lg p-2 text-center">
 
-                  Line {item.line}
+                  {item.line}
 
                 </div>
 
